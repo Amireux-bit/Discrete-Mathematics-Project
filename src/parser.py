@@ -151,4 +151,3 @@ class Parser:
             return self.consume() 
         else:
             raise ParserError(f"Expected an expression (variable, boolean, or parenthesized expression), found '{token}'.", self.current_line_num)
-
