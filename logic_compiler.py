@@ -309,6 +309,16 @@ class Optimizer:
 
 
 
+class ExecutorError(Exception):
+    def __init__(self, message, line_num=None):
+        super().__init__(message)
+        self.line_num = line_num
+
+    def __str__(self):
+        if self.line_num is not None:
+            return f"Executor Error on line {self.line_num}: {super().__str__()}"
+        return f"Executor Error: {super().__str__()}"
+
 class Executor:
     def collect_variables(self, expr):
         if isinstance(expr, str):
@@ -343,21 +353,24 @@ class Executor:
             assignments.append(false_case)
         return assignments
 
-    def evaluate_expression(self, expr, state):
+    def evaluate_expression(self, expr, state, line_num=None):
         if isinstance(expr, str):
             if expr == 'TRUE' or expr == 'FALSE':
                 return expr
             if expr.startswith('VAR_'):
+                # if the variable is not defined in the current state, an executor error should be raised
+                if expr not in state:
+                    raise ExecutorError(f"Variable '{expr}' is not defined in the current state.", line_num)
                 return state[expr]
         
         op = expr[0]
         if op == 'NOT':
-            operand_value = self.evaluate_expression(expr[1], state)
+            operand_value = self.evaluate_expression(expr[1], state, line_num)
             if operand_value == 'TRUE':
                 return 'FALSE'
             return 'TRUE'
-        left_value = self.evaluate_expression(expr[1], state)
-        right_value = self.evaluate_expression(expr[2], state)
+        left_value = self.evaluate_expression(expr[1], state, line_num)
+        right_value = self.evaluate_expression(expr[2], state, line_num)
         if op == 'AND':
             if left_value == 'TRUE' and right_value == 'TRUE':
                 return 'TRUE'
@@ -377,8 +390,8 @@ class Executor:
         original_column = []
         optimized_column = []
         for state in assignments:
-            original_column.append(self.evaluate_expression(original_expr, state))
-            optimized_column.append(self.evaluate_expression(optimized_expr, state))
+            original_column.append(self.evaluate_expression(original_expr, state, line_num))
+            optimized_column.append(self.evaluate_expression(optimized_expr, state, line_num))
 
         return {
             'line': line_num,
@@ -393,16 +406,19 @@ class Executor:
         if stmt_type == 'LET':
             var_name = ast[1]
             expr = ast[2]
-            state[var_name] = self.evaluate_expression(expr, state)
+            state[var_name] = self.evaluate_expression(expr, state, line_num)
             return
         if stmt_type == 'IF':
             condition = ast[1]
             consequent = ast[2]
-            if self.evaluate_expression(condition, state) == 'TRUE':
+            if self.evaluate_expression(condition, state, line_num) == 'TRUE':
                 self.execute_statement(consequent, state, printed_output, line_num)
             return
         if stmt_type == 'PRINT':
             var_name = ast[1]
+            # if the variable to print is not defined in the current state, an executor error should be raised
+            if var_name not in state:
+                raise ExecutorError(f"Variable '{var_name}' is not defined in the current state.", line_num)
             printed_output.append({'line': line_num, 'output': state[var_name]})
             return
         
@@ -495,6 +511,11 @@ def main():
     except ParserError as e:
         pipeline_results['error'] = {
             'phase': 'phase_2_parser',
+            'line': e.line_num,
+        }
+    except ExecutorError as e:
+        pipeline_results['error'] = {
+            'phase': 'phase_4_execution',
             'line': e.line_num,
         }
 

@@ -1,0 +1,33 @@
+{
+  "phase_1_lexer": [
+    {
+      "line": 1,
+      "tokens": [
+        "PRINT",
+        "VAR_X"
+      ]
+    }
+  ],
+  "phase_2_parser": [
+    {
+      "line": 1,
+      "ast": [
+        "PRINT",
+        "VAR_X"
+      ]
+    }
+  ],
+  "phase_3_optimizer": [
+    {
+      "line": 1,
+      "ast": [
+        "PRINT",
+        "VAR_X"
+      ]
+    }
+  ],
+  "error": {
+    "phase": "phase_4_execution",
+    "line": 1
+  }
+}
