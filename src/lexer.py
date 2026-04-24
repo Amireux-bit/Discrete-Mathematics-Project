@@ -19,7 +19,7 @@ class Lexer:
 
         keyword_pattern = r'\b(' + '|'.join(re.escape(k) for k in self.KEYWORDS_BOOLEANS_OPERATORS.keys()) + r')\b'
         symbol_pattern = '|'.join(re.escape(s) for s in sorted(self.SYMBOLS.keys(), key=len, reverse=True))
-        variable_pattern = r'\b[a-z]+\b' 
+        variable_pattern = r'\b[a-z]\b' 
         whitespace_pattern = r'\s+'
         unknown_pattern = r'.'
 
@@ -74,12 +74,3 @@ class Lexer:
         
         return all_tokens_by_line
     
-if __name__ == "__main__":
-    code = """let p = T
-if (p AND ) then print p
-"""
-    lexer = Lexer()
-    tokens = lexer.tokenize(code)
-    for line in tokens:
-        tokens_str = str(line['tokens']).replace("'", '"')
-        print(f'" line ": {line["line"]}, " tokens ": {tokens_str}')

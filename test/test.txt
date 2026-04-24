@@ -2,3 +2,6 @@ let p = T
 let q = F
 let r = (NOT ((NOT p) AND q))
 if r then print p
+let x = ((q OR r) AND (p OR (NOT r))) IMPLIES ((NOT q) AND r)
+if (q AND x) OR (p OR r) then let y = (q AND x) IMPLIES ((x AND r) OR (q OR q))
+

@@ -7,17 +7,10 @@
         "VAR_X",
         "EQ",
         "L_PAREN",
-        "VAR_P",
+        "VAR_X",
         "AND",
-        "VAR_Q",
+        "TRUE",
         "R_PAREN"
-      ]
-    },
-    {
-      "line": 2,
-      "tokens": [
-        "PRINT",
-        "VAR_X"
       ]
     }
   ],
@@ -29,16 +22,9 @@
         "VAR_X",
         [
           "AND",
-          "VAR_P",
-          "VAR_Q"
+          "VAR_X",
+          "TRUE"
         ]
-      ]
-    },
-    {
-      "line": 2,
-      "ast": [
-        "PRINT",
-        "VAR_X"
       ]
     }
   ],
@@ -48,17 +34,6 @@
       "ast": [
         "LET",
         "VAR_X",
-        [
-          "AND",
-          "VAR_P",
-          "VAR_Q"
-        ]
-      ]
-    },
-    {
-      "line": 2,
-      "ast": [
-        "PRINT",
         "VAR_X"
       ]
     }

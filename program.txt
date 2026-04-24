@@ -1,4 +1,4 @@
 let p = T
-let q = F
-let r = (NOT ((NOT p) AND q))
-if r then print p
+let x = (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT p))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+print x
+

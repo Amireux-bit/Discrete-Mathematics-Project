@@ -1,0 +1,4 @@
+let a= NOT p
+let b= p AND q
+let casb = (a OR b)
+let A= (NOT b)

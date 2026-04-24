@@ -3,31 +3,52 @@
     {
       "line": 1,
       "tokens": [
-        "PRINT",
-        "VAR_X"
+        "LET",
+        "VAR_P",
+        "EQ",
+        "TRUE"
       ]
-    }
-  ],
-  "phase_2_parser": [
+    },
     {
-      "line": 1,
-      "ast": [
-        "PRINT",
-        "VAR_X"
+      "line": 2,
+      "tokens": [
+        "LET",
+        "VAR_Q",
+        "EQ",
+        "FALSE"
       ]
-    }
-  ],
-  "phase_3_optimizer": [
+    },
     {
-      "line": 1,
-      "ast": [
+      "line": 3,
+      "tokens": [
+        "LET",
+        "VAR_X",
+        "EQ",
+        "L_PAREN",
+        "L_PAREN",
+        "L_PAREN",
+        "L_PAREN",
+        "L_PAREN",
+        "VAR_P",
+        "AND",
+        "VAR_Q",
+        "R_PAREN",
+        "R_PAREN",
+        "R_PAREN",
+        "R_PAREN",
+        "R_PAREN"
+      ]
+    },
+    {
+      "line": 4,
+      "tokens": [
         "PRINT",
         "VAR_X"
       ]
     }
   ],
   "error": {
-    "phase": "phase_4_execution",
-    "line": 1
+    "phase": "phase_2_parser",
+    "line": 3
   }
 }

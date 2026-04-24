@@ -3,6 +3,7 @@ import sys
 import json
 
 class LexerError(Exception):
+    '''Raised when the lexer encounters an error, including line number for better error reporting.'''
     def __init__(self, message, line_num = None):
         super().__init__(message)
         self.line_num = line_num
@@ -14,6 +15,7 @@ class LexerError(Exception):
 
 class Lexer:
     def __init__(self):
+        #Initialize the lexer with patterns for keywords, operators, symbols, variables, and whitespace.
         self.KEYWORDS_BOOLEANS_OPERATORS = {
             'let': 'LET', 'if': 'IF', 'then': 'THEN', 'print': 'PRINT',
             'T': 'TRUE', 'F': 'FALSE',
@@ -26,12 +28,13 @@ class Lexer:
             ')': 'R_PAREN'
         }
 
-        keyword_pattern = r'\b(' + '|'.join(re.escape(k) for k in self.KEYWORDS_BOOLEANS_OPERATORS.keys()) + r')\b'
-        symbol_pattern = '|'.join(re.escape(s) for s in sorted(self.SYMBOLS.keys(), key=len, reverse=True))
-        variable_pattern = r'\b[a-z]\b' 
-        whitespace_pattern = r'\s+'
-        unknown_pattern = r'.'
+        keyword_pattern = r'\b(' + '|'.join(re.escape(k) for k in self.KEYWORDS_BOOLEANS_OPERATORS.keys()) + r')\b'# create a regex pattern that matches any of the keywords, boolean constants, or operators as whole words
+        symbol_pattern = '|'.join(re.escape(s) for s in sorted(self.SYMBOLS.keys(), key=len, reverse=True)) # create a regex pattern that matches any of the symbols, sorted by length to ensure longer symbols are matched first
+        whitespace_pattern = r'\s+' # create a regex pattern that matches one or more whitespace
+        variable_pattern = r'\b[a-z]\b' # create a regex pattern that matches single lowercase letters as variables
+        unknown_pattern = r'.' # matches any single character that doesn't fit into the other categories
 
+        #Combine all the patterns into a single regex with named groups for easier token identification during the tokenization process. 
         self.token_regex = re.compile(
             rf'(?P<KEYWORD>{keyword_pattern})|'
             rf'(?P<SYMBOL>{symbol_pattern})|'
@@ -41,6 +44,10 @@ class Lexer:
         )
     
     def tokenize(self, source_lines):
+        '''
+        Tokenize the input source lines, returning a structured list of tokens for each line. 
+        The lexer processes each line character by character, 
+        '''
         all_tokens_by_line = []
         for line_num, line_content in enumerate(source_lines, 1):
             line_tokens = []
@@ -48,7 +55,7 @@ class Lexer:
             
             while pos < len(line_content):
                 match = self.token_regex.match(line_content, pos)
-                
+                #if no match is found,raise a LexerError 
                 if not match:
                     raise LexerError(
                         f"Unexpected character '{line_content[pos]}' at column {pos + 1}.",
@@ -85,6 +92,7 @@ class Lexer:
 
 
 class ParserError(Exception):
+    ''''Raised when the parser encounters a syntax error, including line number for better error reporting.'''
     def __init__(self, message, line_num = None):
         super().__init__(message)
         self.line_num = line_num
@@ -102,6 +110,7 @@ class Parser:
         self.pos = 0                  
 
     def parse(self, all_tokens_by_line_input):
+
         self.all_tokens_by_line = all_tokens_by_line_input
         parsed_statements = []
         for line_data in self.all_tokens_by_line:
@@ -125,6 +134,10 @@ class Parser:
         return None
 
     def consume(self, expected_type=None):
+        '''
+        Consume the current token and advance the position. 
+        If expected_type is provided, check that the current token matches it before consuming.
+        '''
         current_token = self.current_token()
         if current_token is None:
             raise ParserError(f"Unexpected end of input. Expected {expected_type if expected_type else 'a token'}.", self.current_line_num)
@@ -138,6 +151,7 @@ class Parser:
         return current_token
 
     def parse_statement(self):
+        '''Determine the type of statement based on the first token and delegate to the appropriate parsing method.'''
         token_type = self.current_token()
         if token_type is None:
             raise ParserError("Unexpected end of input: expecting a statement.", self.current_line_num)
@@ -155,6 +169,7 @@ class Parser:
         )
 
     def parse_let(self):
+        '''Parse a LET statement, which has the form: let <Variable> = <Expression>.'''
         self.consume('LET')
         var_name_token = self.current_token()
         if var_name_token is None or not var_name_token.startswith('VAR_'):
@@ -165,6 +180,7 @@ class Parser:
         return ['LET', var_name, expr]
 
     def parse_if(self):
+        '''Parse an IF statement, which has the form: if <Expression> then <Statement>.'''
         self.consume('IF')
         condition = self.parse_expression()
         self.consume('THEN')
@@ -172,6 +188,7 @@ class Parser:
         return ['IF', condition, consequent]
 
     def parse_print(self):
+        '''Parse a PRINT statement, which has the form: print <Variable>.'''
         self.consume('PRINT') 
         var_to_print_token = self.current_token()
         if var_to_print_token is None or not var_to_print_token.startswith('VAR_'):
@@ -180,6 +197,7 @@ class Parser:
         return ['PRINT', var_name]
 
     def parse_expression(self):
+        '''Parse an expression, which can be a variable, boolean constant, or a parenthesized expression with operators.'''
         token = self.current_token()
         if token is None:
             raise ParserError("Unexpected end of input: missing expression or operand.", self.current_line_num)
@@ -315,6 +333,7 @@ class ExecutorError(Exception):
         self.line_num = line_num
 
     def __str__(self):
+        '''Provide a detailed error message that includes the line number.'''
         if self.line_num is not None:
             return f"Executor Error on line {self.line_num}: {super().__str__()}"
         return f"Executor Error: {super().__str__()}"
@@ -334,6 +353,7 @@ class Executor:
         return left_vars.union(right_vars)
     
     def generate_truth_assignments(self, variables):
+        '''Given a set of variables, generate all possible truth assignments for those variables.'''
         sorted_vars = sorted(variables)
         if not sorted_vars:
             return [{}]
@@ -385,6 +405,7 @@ class Executor:
             return 'TRUE'
     
     def verify_equivalence(self, original_expr, optimized_expr, line_num):
+        '''Verify that the original and optimized expressions are logically equivalent by evaluating them under all possible truth assignments for their variables.'''
         variables = sorted(self.collect_variables(original_expr).union(self.collect_variables(optimized_expr)))
         assignments = self.generate_truth_assignments(variables)
         original_column = []
@@ -402,6 +423,7 @@ class Executor:
         }
 
     def execute_statement(self, ast, state, printed_output, line_num):
+        '''Execute a statement based on its type (LET, IF, PRINT) and update the state or printed output accordingly.'''
         stmt_type = ast[0]
         if stmt_type == 'LET':
             var_name = ast[1]
@@ -423,6 +445,7 @@ class Executor:
             return
         
     def collect_changed_expression_pairs(self, original_ast, optimized_ast, line_num):
+        '''Recursively collect pairs of original and optimized expressions that differ, along with the line number for reference.'''
         changed_pairs = []
         stmt_type = original_ast[0]
         if stmt_type == 'LET':

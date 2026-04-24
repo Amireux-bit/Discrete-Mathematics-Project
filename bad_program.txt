@@ -1,2 +1,2 @@
-let p = T
-if (p AND ) then print p
+let x = (p AND q)
+print x
