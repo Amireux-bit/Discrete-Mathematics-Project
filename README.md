@@ -4,7 +4,7 @@
 From the project root:
 
 ```bash
-cd Discrete-Mathematics-Project
+cd project_root
 python logic_compiler.py <input_file> <output_file>
 ```
 
@@ -33,7 +33,7 @@ On success, the JSON includes:
 - `phase_3_optimizer`
 - `phase_4_execution`
 
-On failure, the JSON includes an `error` object:
+On failure, the JSON includes phases that succeeded and an `error` object:
 
 - `phase`: failing stage (`phase_1_lexer`, `phase_2_parser`, or `phase_4_execution`)
 - `line`: source line number
